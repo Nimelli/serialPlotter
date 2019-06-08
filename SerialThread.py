@@ -3,6 +3,7 @@ import queue
 import serial
 import time
 import json
+from datetime import datetime
 
 class SerialThread(threading.Thread):
     def __init__(self, rxQueue, txQueue,  port, baudrate, debug=False):
@@ -41,11 +42,22 @@ class SerialThread(threading.Thread):
 
                 msg = {}
                 msg['Sensor'] = 'TSLxxxx'
+                msg['TStamp'] = datetime.now().timestamp()
                 msg['T'] = n
 
                 msg_json = json.dumps(msg)
 
                 self.rxQueue.put(msg_json.encode('utf-8'))
+
+                msg = {}
+                msg['Sensor'] = 'BME680'
+                msg['TStamp'] = datetime.now().timestamp()
+                msg['T'] = 10-n/2
+
+                msg_json = json.dumps(msg)
+
+                self.rxQueue.put(msg_json.encode('utf-8'))
+
                 # print('Serial Thread: ' + str(n))
                 n+=0.1
                 if(n>=10):

@@ -19,9 +19,10 @@ from math import sin
 import json
 
 DEBUG_SERIAL    = True
-NB_OF_SIGNALS   = 10
+NB_OF_SIGNALS   = 7
 VERBOSE         = True
 
+penColors = ['b', 'r', 'g', 'y', 'c', 'm', 'k']
 sensorNameToId = {'TSLxxxx':0, 'BME680':1}
 
 
@@ -37,8 +38,12 @@ class App(QWidget):
 
         self.plt = pg.PlotWidget()
         self.signals = []
+        self.signalsDataX = []
+        self.signalsDataY = []
         for i in range(0,NB_OF_SIGNALS):
-            self.signals.append(self.plt.plot())
+            self.signals.append(self.plt.plot(pen=penColors[i]))
+            self.signalsDataX.append(np.array([]))
+            self.signalsDataY.append(np.array([]))
 
         self.s1XData = np.array([])
         self.s1YData = np.array([])
@@ -99,16 +104,18 @@ class App(QWidget):
                 msg_obj = json.loads(msg_str)
 
                 if(VERBOSE):                        
-                    print(msg_obj["Sensor"])
-                    print(sensorNameToId[msg_obj["Sensor"]])
+                    print(msg_obj)
+
+                sensorId = sensorNameToId[msg_obj["Sensor"]]
+                self.signalsDataY[sensorId] = np.append(self.signalsDataY[sensorId], msg_obj["T"])
+                self.signalsDataX[sensorId] = np.append(self.signalsDataX[sensorId], msg_obj["TStamp"])
                 
-                #self.s1YData = np.append(self.s1YData, float(msg_str))
-                #self.s1XData = np.append(self.s1XData, self.s1YData.shape[0])
             except:
                 pass
 
         # update signals
-        #self.signals[0].setData(self.s1XData, self.s1YData)
+        for i in range(0,NB_OF_SIGNALS):
+            self.signals[i].setData(self.signalsDataX[i], self.signalsDataY[i])
 
     
 if __name__ == '__main__':
