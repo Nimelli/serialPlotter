@@ -22,6 +22,9 @@ DEBUG_SERIAL    = True
 NB_OF_SIGNALS   = 10
 VERBOSE         = True
 
+sensorNameToId = {'TSLxxxx':0, 'BME680':1}
+
+
 class App(QWidget):
 
     def __init__(self):
@@ -97,6 +100,7 @@ class App(QWidget):
 
                 if(VERBOSE):                        
                     print(msg_obj["Sensor"])
+                    print(sensorNameToId[msg_obj["Sensor"]])
                 
                 #self.s1YData = np.append(self.s1YData, float(msg_str))
                 #self.s1XData = np.append(self.s1XData, self.s1YData.shape[0])
