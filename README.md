@@ -1,7 +1,7 @@
 # SerialPlotter
 Python utility to plot data (typically data from sensors) coming from a serial port.
 
-Usefull for visualizing sensors data.
+Useful for visualizing sensors data.
 
 ## Installation
 
