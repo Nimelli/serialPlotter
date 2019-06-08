@@ -6,6 +6,9 @@ from PyQt5.QtCore import Qt, QTimer
 
 
 import pyqtgraph as pg
+pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', 'k')
+
 import numpy as np
 
 import threading
@@ -13,8 +16,11 @@ import queue
 from SerialThread import SerialThread
 
 from math import sin
+import json
 
-DEBUG_SERIAL = True
+DEBUG_SERIAL    = True
+NB_OF_SIGNALS   = 10
+VERBOSE         = True
 
 class App(QWidget):
 
@@ -28,7 +34,7 @@ class App(QWidget):
 
         self.plt = pg.PlotWidget()
         self.signals = []
-        for i in range(0,8):
+        for i in range(0,NB_OF_SIGNALS):
             self.signals.append(self.plt.plot())
 
         self.s1XData = np.array([])
@@ -86,17 +92,19 @@ class App(QWidget):
             try:
                 msg = self.rxQueue.get()
                 msg_str = msg.decode("utf-8")
-                msg_list = msg_str.split(',')
-                for i in range(0, len(msg_list)):
-                    if(i==0):
-                        self.s1YData = np.append(self.s1YData, float(msg_list[i].strip()))
-                        self.s1XData = np.append(self.s1XData, self.s1YData.shape[0])
-                #self.console.append(msg_str)
+
+                msg_obj = json.loads(msg_str)
+
+                if(VERBOSE):                        
+                    print(msg_obj["Sensor"])
+                
+                #self.s1YData = np.append(self.s1YData, float(msg_str))
+                #self.s1XData = np.append(self.s1XData, self.s1YData.shape[0])
             except:
                 pass
 
         # update signals
-        self.signals[0].setData(self.s1XData, self.s1YData)
+        #self.signals[0].setData(self.s1XData, self.s1YData)
 
     
 if __name__ == '__main__':

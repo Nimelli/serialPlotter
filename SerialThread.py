@@ -2,6 +2,7 @@ import threading
 import queue
 import serial
 import time
+import json
 
 class SerialThread(threading.Thread):
     def __init__(self, rxQueue, txQueue,  port, baudrate, debug=False):
@@ -37,7 +38,14 @@ class SerialThread(threading.Thread):
             n = 0
             while(not self.stopSignal):
                 time.sleep(0.01)
-                self.rxQueue.put(str(n).encode('utf-8'))
+
+                msg = {}
+                msg['Sensor'] = 'TSLxxxx'
+                msg['T'] = n
+
+                msg_json = json.dumps(msg)
+
+                self.rxQueue.put(msg_json.encode('utf-8'))
                 # print('Serial Thread: ' + str(n))
                 n+=0.1
                 if(n>=10):
