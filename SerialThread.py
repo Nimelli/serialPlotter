@@ -15,7 +15,7 @@ class SerialThread(threading.Thread):
         self.port = port
         self.baud = baudrate
         self.debug = debug
-        
+
     def run(self):
         self.running = True
         if(not self.debug):
@@ -42,24 +42,12 @@ class SerialThread(threading.Thread):
             while(not self.stopSignal):
                 time.sleep(0.01)
 
-                
                 msgData = {}
-                msgData['T'] = n
+                msgData['AccX'] = n
+                msgData['AccY'] = n*n/10
+                msgData['AccZ'] = 1.2**n
                 msg = {}
-                msg['Sensor'] = 'TSLxxxx'
-                msg['TStamp'] = datetime.now().timestamp() 
-                msg['Data'] = msgData
-
-                msg_json = json.dumps(msg)
-
-                self.rxQueue.put(msg_json.encode('utf-8'))
-
-                msgData = {}
-                msgData['T'] = 10-n/2
-                msgData['P'] = n*n/10
-                msgData['H'] = 1.2**n
-                msg = {}
-                msg['Sensor'] = 'BME680'
+                msg['Sensor'] = 'MPU6050'
                 msg['TStamp'] = datetime.now().timestamp()
                 msg['Data'] = msgData
                 

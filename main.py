@@ -19,6 +19,9 @@ import colorsys
 
 DEBUG_SERIAL    = True
 VERBOSE         = True
+
+SERIAL_PORT         = 'COM4'
+SERIAL_BAUDRATE     = 9600
 NB_OF_SIGNALS   = 10
 
 def get_N_HexCol(N=5):
@@ -60,7 +63,7 @@ class App(QWidget):
         # serial thread
         self.rxQueue = queue.Queue()
         self.txQueue = queue.Queue()
-        self.serThread = SerialThread(self.rxQueue, self.txQueue, 'COM4', 9600, debug=DEBUG_SERIAL) # default port and baudrate
+        self.serThread = SerialThread(self.rxQueue, self.txQueue, SERIAL_PORT, SERIAL_BAUDRATE, debug=DEBUG_SERIAL) # default port and baudrate
         self.serThread.start()
 
         # timer to call update() undefinitely
