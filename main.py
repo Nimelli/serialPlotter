@@ -36,7 +36,7 @@ class App(QWidget):
 
         self.rxQueue = queue.Queue()
         self.txQueue = queue.Queue()
-        self.serThread = sthread.SerialThread(self.rxQueue, self.txQueue, 'COM4', 9600, debug=DEBUG_SERIAL) # default port and baudrate
+        self.serThread = SerialThread(self.rxQueue, self.txQueue, 'COM4', 9600, debug=DEBUG_SERIAL) # default port and baudrate
         self.serThread.start()
 
         self.updateTimer = QTimer(self)
@@ -62,7 +62,7 @@ class App(QWidget):
         mainGrid.addWidget(self.plotGroupBox)
 
         plotLayout = QVBoxLayout()
-        plotLayout.addWidget(self.plots)
+        plotLayout.addWidget(self.plt)
         self.plotGroupBox.setLayout(plotLayout)
 
         self.setLayout(mainGrid)
@@ -77,13 +77,6 @@ class App(QWidget):
         print('Closing')
         event.accept() # let the window close
 
-    def s1Toggle(self, state):
-        if(state == Qt.Checked):
-            print('s1 on')
-            self.enableS1 = True
-        else:
-            print('s1 off')
-            self.enableS1 = False
 
     def update(self):
         # update loop
