@@ -15,6 +15,7 @@ class SerialThread(threading.Thread):
         self.port = port
         self.baud = baudrate
         self.debug = debug
+        
     def run(self):
         self.running = True
         if(not self.debug):
@@ -36,6 +37,7 @@ class SerialThread(threading.Thread):
                         pass
             ser.close()
         else:
+            # fake message for develpment
             n = 0
             while(not self.stopSignal):
                 time.sleep(0.01)

@@ -10,18 +10,16 @@ pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', 'k')
 
 import numpy as np
-
 import threading
 import queue
 from SerialThread import SerialThread
-
 from math import sin
 import json
 import colorsys
 
 DEBUG_SERIAL    = True
-NB_OF_SIGNALS   = 10
 VERBOSE         = True
+NB_OF_SIGNALS   = 10
 
 def get_N_HexCol(N=5):
     HSV_tuples = [(x * 1.0 / N, 0.5, 0.5) for x in range(N)]
@@ -46,6 +44,7 @@ class App(QWidget):
         self.width = 1080
         self.height = 720
 
+        # plots variables
         self.plt = pg.PlotWidget()
         self.signals = []
         self.signalsDataX = []
@@ -58,14 +57,13 @@ class App(QWidget):
         self.signalAssigned = np.zeros([NB_OF_SIGNALS], dtype=bool)
         self.sensorDataToIdx = {}
 
-        self.s1XData = np.array([])
-        self.s1YData = np.array([])
-
+        # serial thread
         self.rxQueue = queue.Queue()
         self.txQueue = queue.Queue()
         self.serThread = SerialThread(self.rxQueue, self.txQueue, 'COM4', 9600, debug=DEBUG_SERIAL) # default port and baudrate
         self.serThread.start()
 
+        # timer to call update() undefinitely
         self.updateTimer = QTimer(self)
         self.updateTimer.setInterval(10)
         self.updateTimer.timeout.connect(self.update)
@@ -105,12 +103,15 @@ class App(QWidget):
         event.accept() # let the window close
 
     def assignDataToSignal(self, key):
+        # function used to assignal a particular data stream to a signal plot
+
         # count how many signal are not already assigned
         lefts = np.nonzero(self.signalAssigned==0)[0]
         if(lefts.size == 0):
             print('Error: no more signals left')
             return -1
         else:
+            # assign to first available signal
             idx = lefts[0] # first left
         
             self.signalAssigned[idx] = True
@@ -119,7 +120,7 @@ class App(QWidget):
             return idx
 
     def getSignalIndex(self, key):
-        #print(key)
+        # function used to retreive ti signal plot index based on the data name (key)
         if (key in self.sensorDataToIdx.keys() ):
             # key is already assigned
             return self.sensorDataToIdx[key]
