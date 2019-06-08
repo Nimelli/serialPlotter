@@ -38,22 +38,29 @@ class SerialThread(threading.Thread):
         else:
             n = 0
             while(not self.stopSignal):
-                time.sleep(0.01)
+                time.sleep(0.1)
 
+                
+                msgData = {}
+                msgData['T'] = n
                 msg = {}
                 msg['Sensor'] = 'TSLxxxx'
-                msg['TStamp'] = datetime.now().timestamp()
-                msg['T'] = n
+                msg['TStamp'] = datetime.now().timestamp() 
+                msg['Data'] = msgData
 
                 msg_json = json.dumps(msg)
 
                 self.rxQueue.put(msg_json.encode('utf-8'))
 
+                msgData = {}
+                msgData['T'] = 10-n/2
+                msgData['P'] = n*n/10
+                msgData['H'] = 1.2**n
                 msg = {}
                 msg['Sensor'] = 'BME680'
                 msg['TStamp'] = datetime.now().timestamp()
-                msg['T'] = 10-n/2
-
+                msg['Data'] = msgData
+                
                 msg_json = json.dumps(msg)
 
                 self.rxQueue.put(msg_json.encode('utf-8'))

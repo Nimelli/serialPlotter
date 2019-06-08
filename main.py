@@ -17,13 +17,23 @@ from SerialThread import SerialThread
 
 from math import sin
 import json
+import colorsys
 
 DEBUG_SERIAL    = True
-NB_OF_SIGNALS   = 7
+NB_OF_SIGNALS   = 10
 VERBOSE         = True
 
-penColors = ['b', 'r', 'g', 'y', 'c', 'm', 'k']
-sensorNameToId = {'TSLxxxx':0, 'BME680':1}
+def get_N_HexCol(N=5):
+    HSV_tuples = [(x * 1.0 / N, 0.5, 0.5) for x in range(N)]
+    hex_out = []
+    for rgb in HSV_tuples:
+        rgb = map(lambda x: int(x * 255), colorsys.hsv_to_rgb(*rgb))
+        hex_out.append('#%02x%02x%02x' % tuple(rgb))
+    return hex_out
+
+
+penColors = get_N_HexCol(10)
+print(penColors)
 
 
 class App(QWidget):
@@ -44,6 +54,9 @@ class App(QWidget):
             self.signals.append(self.plt.plot(pen=penColors[i]))
             self.signalsDataX.append(np.array([]))
             self.signalsDataY.append(np.array([]))
+
+        self.signalAssigned = np.zeros([NB_OF_SIGNALS], dtype=bool)
+        self.sensorDataToIdx = {}
 
         self.s1XData = np.array([])
         self.s1YData = np.array([])
@@ -91,6 +104,28 @@ class App(QWidget):
         print('Closing')
         event.accept() # let the window close
 
+    def assignDataToSignal(self, key):
+        # count how many signal are not already assigned
+        lefts = np.nonzero(self.signalAssigned==0)[0]
+        if(lefts.size == 0):
+            print('Error: no more signals left')
+            return -1
+        else:
+            idx = lefts[0] # first left
+        
+            self.signalAssigned[idx] = True
+            self.sensorDataToIdx[key] = idx
+            print('key: {}, idx: {}'.format(key, idx))
+            return idx
+
+    def getSignalIndex(self, key):
+        #print(key)
+        if (key in self.sensorDataToIdx.keys() ):
+            # key is already assigned
+            return self.sensorDataToIdx[key]
+        else:
+            return self.assignDataToSignal(key)
+
 
     def update(self):
         # update loop
@@ -106,9 +141,15 @@ class App(QWidget):
                 if(VERBOSE):                        
                     print(msg_obj)
 
-                sensorId = sensorNameToId[msg_obj["Sensor"]]
-                self.signalsDataY[sensorId] = np.append(self.signalsDataY[sensorId], msg_obj["T"])
-                self.signalsDataX[sensorId] = np.append(self.signalsDataX[sensorId], msg_obj["TStamp"])
+                sensorName = msg_obj["Sensor"]
+                sensorData = msg_obj["Data"]
+
+                for key in sensorData.keys():
+                    compoudKey = sensorName + key
+                    idx = self.getSignalIndex(compoudKey)
+
+                    self.signalsDataY[idx] = np.append(self.signalsDataY[idx], sensorData[key])
+                    self.signalsDataX[idx] = np.append(self.signalsDataX[idx], msg_obj["TStamp"])
                 
             except:
                 pass
