@@ -32,7 +32,7 @@ def get_N_HexCol(N=5):
     return hex_out
 
 
-penColors = get_N_HexCol(10)
+penColors = get_N_HexCol(NB_OF_SIGNALS)
 print(penColors)
 
 
@@ -51,7 +51,7 @@ class App(QWidget):
         self.signalsDataX = []
         self.signalsDataY = []
         for i in range(0,NB_OF_SIGNALS):
-            self.signals.append(self.plt.plot(pen=penColors[i]))
+            self.signals.append(self.plt.plot(pen=pg.mkPen(penColors[i], width=3)))
             self.signalsDataX.append(np.array([]))
             self.signalsDataY.append(np.array([]))
 
@@ -145,7 +145,7 @@ class App(QWidget):
                 sensorData = msg_obj["Data"]
 
                 for key in sensorData.keys():
-                    compoudKey = sensorName + key
+                    compoudKey = sensorName + '_' + key
                     idx = self.getSignalIndex(compoudKey)
 
                     self.signalsDataY[idx] = np.append(self.signalsDataY[idx], sensorData[key])

@@ -38,7 +38,7 @@ class SerialThread(threading.Thread):
         else:
             n = 0
             while(not self.stopSignal):
-                time.sleep(0.1)
+                time.sleep(0.01)
 
                 
                 msgData = {}
