@@ -3,6 +3,8 @@ Python utility to plot data (typically data from sensors) coming from a serial p
 
 Useful for visualizing sensors data.
 
+![Alt text](screenshot.png?raw=true "Screenshot")
+
 ## Installation
 
 ### Prerequisite
